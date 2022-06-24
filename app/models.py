@@ -1,11 +1,12 @@
-from app import db
+from . import db
 from datetime import datetime
 import re
 
 
 def slugify(s):
     pattern = r'[\W_]+'
-    return re.sub(pattern, '_', s).lower()
+    temp = re.sub(pattern, '_', s).lower()
+    return re.sub('_$','', temp)
 
 
 class Post(db.Model):

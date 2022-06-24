@@ -1,7 +1,11 @@
 from . import posts_bp
 from flask import render_template
+from .. import db
+from ..models import Post
 
 
 @posts_bp.route('/')
 def view():
-    return render_template('posts/view.html')
+    posts = Post.query.all()
+
+    return render_template('posts/blog_view.html', posts=posts)

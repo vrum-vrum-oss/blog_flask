@@ -3,3 +3,4 @@
 app/__pycache__/
 app/main/__pycache__
 temp.txt
+app/posts/__pycache__

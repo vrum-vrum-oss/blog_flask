@@ -12,5 +12,11 @@
 
 
 {% block content %}
-    Some blog content
+    
+    {% for post in posts %}
+        <p>
+            {{post.title}}
+        </p>
+    {% endfor %}
+
 {% endblock %}
