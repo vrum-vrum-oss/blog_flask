@@ -9,3 +9,9 @@ def view():
     posts = Post.query.all()
 
     return render_template('posts/blog_view.html', posts=posts)
+
+
+@posts_bp.route('/<slug>')
+def post_detail(slug):
+    post = Post.query.filter_by(slug=slug).first()
+    return render_template('posts/post_detail.html', post=post)

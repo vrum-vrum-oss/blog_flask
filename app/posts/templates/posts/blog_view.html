@@ -7,7 +7,7 @@
 
 
 {% block content_title %}
-    This is blog index page!
+    Posts
 {% endblock %}
 
 
@@ -15,7 +15,7 @@
     
     {% for post in posts %}
         <p>
-            {{post.title}}
+            <a href="{{ url_for('posts.post_detail', slug=post.slug) }}"> {{ post.title }} </a>
         </p>
     {% endfor %}
 
