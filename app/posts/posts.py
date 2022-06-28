@@ -5,11 +5,11 @@ from .. import db
 from ..models import Post, Tag
 from .forms import PostForm
 
-@posts_bp.route('/', methods=['GET', 'POST'])
+@posts_bp.route('/')
 def view():
     q = request.args.get('q')
     if q:
-        posts = Post.query.filter(Post.title.contains(q) | Post.body.contains(q)).all()
+        posts = Post.query.filter(Post.title.contains(q) | Post.body.contains(q)).order_by(Post.created.desc()).all()
     else:
         posts = Post.query.order_by(Post.created.desc()).all()
     return render_template('posts/blog_view.html', posts=posts)
