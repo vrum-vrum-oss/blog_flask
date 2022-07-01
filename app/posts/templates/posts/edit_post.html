@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+    Edit post
+{% endblock %}
+
+
+{% block content_title %}
+    Edit post
+{% endblock %}
+
+
+{% block content %}
+
+    <form role="form" action="{{ url_for('posts.edit_post', slug=post.slug) }}" method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group col-md-6">
+            {{ form.title.label(class='control-label') }}
+            {{ form.title(class='form-control') }}
+        </div>
+
+        <div class="form-group col-md-6">
+            {{ form.body.label(class='control-label') }}
+            {{ form.body(class='form-control') }}
+        </div>
+            {{ form.submit(class='btn btn-success', style='margin-top: 8px', value='Edit') }}
+    </form>
+
+{% endblock %}
