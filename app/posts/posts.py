@@ -1,4 +1,3 @@
-from shutil import register_unpack_format
 from . import posts_bp
 from flask import render_template, request, redirect, url_for
 from .. import db
@@ -8,11 +7,22 @@ from .forms import PostForm
 @posts_bp.route('/')
 def view():
     q = request.args.get('q')
-    if q:
-        posts = Post.query.filter(Post.title.contains(q) | Post.body.contains(q)).order_by(Post.created.desc()).all()
+    page = request.args.get('page')
+
+    if page and page.isdigit():
+        page = int(page)
     else:
-        posts = Post.query.order_by(Post.created.desc()).all()
-    return render_template('posts/blog_view.html', posts=posts)
+        page = 1
+    
+    if q:
+        posts = Post.query.filter(Post.title.contains(q) | Post.body.contains(q)).order_by(Post.created.desc())#.all()
+    else:
+        posts = Post.query.order_by(Post.created.desc())#.all()
+    
+    pages = posts.paginate(page=page, per_page=3)
+    
+    return render_template('posts/blog_view.html', pages=pages)
+
 
 
 @posts_bp.route('/create', methods=['GET', 'POST'])
