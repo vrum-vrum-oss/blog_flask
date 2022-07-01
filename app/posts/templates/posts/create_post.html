@@ -2,29 +2,29 @@
 
 
 {% block title %}
-    Create new post
+Create new post
 {% endblock %}
 
 
 {% block content_title %}
-    New post
+New post
 {% endblock %}
 
 
 {% block content %}
 
-    <form role="form" action="{{ url_for('posts.create_post') }}" method="POST">
-        {{ form.hidden_tag() }}
-        <div class="form-group col-md-6">
-            {{ form.title.label(class='control-label') }}
-            {{ form.title(class='form-control') }}
-        </div>
+<form role="form" action="{{ url_for('posts.create_post') }}" method="POST">
+    {{ form.hidden_tag() }}
+    <div class="form-group col-md-6">
+        {{ form.title.label(class='control-label') }}
+        {{ form.title(class='form-control') }}
+    </div>
 
-        <div class="form-group col-md-6">
-            {{ form.body.label(class='control-label') }}
-            {{ form.body(class='form-control') }}
-        </div>
-            {{ form.submit(class='btn btn-success', style='margin-top: 8px') }}
-    </form>
+    <div class="form-group col-md-6">
+        {{ form.body.label(class='control-label') }}
+        {{ form.body(class='form-control') }}
+    </div>
+    {{ form.submit(class='btn btn-success', style='margin-top: 8px') }}
+</form>
 
 {% endblock %}

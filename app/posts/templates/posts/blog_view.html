@@ -1,6 +1,17 @@
 {% extends 'base.html' %}
 
 
+{% block head %}
+<style>
+    .pagination > .active > a {
+        color: white;
+        background-color: #292b2c;
+        border: solid 1px #292b2c;
+    }
+</style>
+{% endblock %}
+
+
 {% block title %}
 Blog page
 {% endblock %}
@@ -41,7 +52,7 @@ Posts
         </li>
 
         
-        {% for page in pages.iter_pages(left_edge=0, right_edge=0, left_current=1, right_current=2) %}
+        {% for page in pages.iter_pages(left_edge=0, right_edge=0, left_current=1, right_current=3) %}
             <li class="page-item {% if page == pages.page %} active" aria-current="page{% endif %}">
                 {% if page != None %}
                     <a class="page-link" href="./?page={{ page }}">{{ page }}</a>

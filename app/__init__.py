@@ -1,12 +1,18 @@
 from flask import Flask
 from config import config
+
 # from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
+
+
 # bootstrap = Bootstrap()
 db = SQLAlchemy()
 migrate = Migrate()
+admin = Admin()
 
 
 def create_app(config_name):
@@ -18,6 +24,11 @@ def create_app(config_name):
     # bootstrap.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
+
+    from .models import Post, Tag
+    admin.init_app(app)
+    admin.add_view(ModelView(Post, db.session))
+    admin.add_view(ModelView(Tag, db.session))
 
 
     from .main import main_bp
