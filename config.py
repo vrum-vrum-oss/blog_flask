@@ -18,7 +18,9 @@ class DevelopmentConfig(Config):
 
 
 class TestingConfig(Config):
-    pass
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL')  or \
+        'mysql+mysqlconnector://root:root@localhost/data_test'
 
 
 class ProductionConfig(Config):
