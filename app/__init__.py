@@ -25,10 +25,12 @@ def create_app(config_name):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    from .models import Post, Tag
+    from .models import Post, Tag, User, Role
     admin.init_app(app)
     admin.add_view(ModelView(Post, db.session))
     admin.add_view(ModelView(Tag, db.session))
+    admin.add_view(ModelView(User, db.session))
+    admin.add_view(ModelView(Role, db.session))
 
 
     from .main import main_bp
