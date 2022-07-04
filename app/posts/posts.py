@@ -6,7 +6,6 @@ from ..models import Post, Tag
 from .forms import PostForm
 
 @posts_bp.route('/')
-@login_required
 def view():
     q = request.args.get('q')
     page = request.args.get('page')
