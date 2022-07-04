@@ -7,10 +7,19 @@
 
 
 {% block content_title %}
-    This is index page!
+
+Hello,
+{% if current_user.is_authenticated %}
+    {{ current_user.username }}
+{% else %}
+    Stranger
+{% endif %}!
+
 {% endblock %}
 
 
 {% block content %}
-    Some content
+    <div>
+        Some index content
+    </div>
 {% endblock %}

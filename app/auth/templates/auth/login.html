@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Login
+{% endblock %}
+
+
+{% block content_title %}
+Login
+{% endblock %}
+
+
+{% block content %}
+
+{% with errors = get_flashed_messages(category_filter=['error']) %}
+{% if errors %}
+<div class="alert alert-danger col-md-auto" role="alert">
+    {% for msg in errors %}
+        {{ msg }}<br>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<form role="form" action="{{ url_for('auth.login') }}" method="POST">
+    {{ form.hidden_tag() }}
+    <div class="form-group col-md-6 mb-3">
+        {{ form.email.label(class='control-label') }}
+        {{ form.email(class='form-control') }}
+    </div>
+
+    <div class="form-group col-md-6 mb-3">
+        {{ form.password.label(class='control-label') }}
+        {{ form.password(class='form-control') }}
+        <div id="passwordHelpBlock" class="form-text">
+            Must be 8-16 characters long
+        </div>
+    </div>
+
+    <div class="form-check mb-3">
+        {{ form.remember_me(class='form-check-input') }}
+        {{ form.remember_me.label(class='form-check-label') }}
+    </div>
+
+    {{ form.submit(class='btn btn-success') }}
+</form>
+
+{% endblock %}

@@ -1,3 +1,4 @@
+from flask_login import login_required
 from . import posts_bp
 from flask import render_template, request, redirect, url_for
 from .. import db
@@ -5,6 +6,7 @@ from ..models import Post, Tag
 from .forms import PostForm
 
 @posts_bp.route('/')
+@login_required
 def view():
     q = request.args.get('q')
     page = request.args.get('page')

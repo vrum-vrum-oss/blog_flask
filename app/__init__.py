@@ -8,11 +8,16 @@ from flask_migrate import Migrate
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 
+from flask_login import LoginManager
+
 
 # bootstrap = Bootstrap()
 db = SQLAlchemy()
 migrate = Migrate()
+login_manager = LoginManager()
+login_manager.login_view = 'auth.login'
 admin = Admin()
+
 
 
 def create_app(config_name):
@@ -24,6 +29,7 @@ def create_app(config_name):
     # bootstrap.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
+    login_manager.init_app(app)
 
 
     from .models import Post, Tag, User, Role
@@ -33,12 +39,17 @@ def create_app(config_name):
     # admin.add_view(ModelView(User, db.session))
     # admin.add_view(ModelView(Role, db.session))
 
+
     from .main import main_bp
     app.register_blueprint(main_bp)
 
 
     from .posts import posts_bp
     app.register_blueprint(posts_bp, url_prefix='/blog')
+
+
+    from .auth import auth_bp
+    app.register_blueprint(auth_bp, url_prefix='/auth')
 
 
     return app
