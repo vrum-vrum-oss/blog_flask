@@ -13,15 +13,17 @@ Register
 
 {% block content %}
 
-<!-- {% with errors = get_flashed_messages(category_filter=['error']) %}
-{% if errors %}
-<div class="alert alert-danger col-md-auto" role="alert">
-    {% for msg in errors %}
-        {{ msg }}<br>
+{% if form.errors %}
+    <ul>
+    {% for field, errors in form.errors.items() %}
+        <li style="list-style-type: none;">
+            <div class="alert alert-danger col-md-6" role="alert"
+            style="--bs-alert-padding-y: 0.5rem;">
+            {{ ', '.join(errors) }}</div>
+        </li>
     {% endfor %}
-</div>
+</ul>
 {% endif %}
-{% endwith %} -->
 
 <form role="form" action="{{ url_for('auth.register') }}" method="POST">
     {{ form.hidden_tag() }}
@@ -33,6 +35,9 @@ Register
     <div class="form-group col-md-6 mb-3">
         {{ form.username.label(class='control-label') }}
         {{ form.username(class='form-control') }}
+        <div id="usernameHelpBlock" class="form-text">
+            Must contain only letters, numbers, dots or underscores
+        </div>
     </div>
 
     <div class="form-group col-md-6 mb-3">

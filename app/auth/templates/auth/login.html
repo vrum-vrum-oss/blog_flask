@@ -13,26 +13,6 @@ Login
 
 {% block content %}
 
-{% with errors = get_flashed_messages(category_filter=['error']) %}
-{% if errors %}
-<div class="alert alert-danger col-md-auto" role="alert">
-    {% for msg in errors %}
-        {{ msg }}<br>
-    {% endfor %}
-</div>
-{% endif %}
-{% endwith %}
-
-{% with successes = get_flashed_messages(category_filter=['success']) %}
-{% if successes %}
-<div class="alert alert-success col-md-auto" role="alert">
-    {% for msg in successes %}
-        {{ msg }}<br>
-    {% endfor %}
-</div>
-{% endif %}
-{% endwith %}
-
 <form role="form" action="{{ url_for('auth.login') }}" method="POST">
     {{ form.hidden_tag() }}
     <div class="form-group col-md-6 mb-3">
