@@ -2,9 +2,11 @@ from . import db, login_manager
 from sqlalchemy.sql import func
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from authlib.jose import JsonWebSignature
+from flask import current_app
 
 import re
-
+import json
 
 def slugify(s):
     pattern = r'[\W_]+'
@@ -64,6 +66,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
     role_id =db.Column(db.Integer, db.ForeignKey('role.id'))
+    confirmed = db.Column(db.Boolean, default=False)
 
 
     def __repr__(self):
@@ -87,6 +90,30 @@ class User(db.Model, UserMixin):
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
+
+
+    def generate_confirmation_token(self):
+        jws = JsonWebSignature()
+        protected = {'alg': 'HS256'}
+        payload = json.dumps({'confirm': self.id})
+        secret = bytes(current_app.config['SECRET_KEY'], encoding='utf-8')
+        return jws.serialize_compact(protected, payload, secret).decode('utf-8')
+
+
+    def confirm(self, token):
+        jws = JsonWebSignature()
+        key = bytes(current_app.config['SECRET_KEY'], encoding='utf-8')
+        try:
+            data = jws.deserialize_compact(token.encode('utf-8'), key) 
+            payload = json.loads(data['payload'])
+        except:
+            return False
+        if payload.get('confirm') != self.id:
+            return False
+        self.confirmed = True
+        db.session.add(self)
+        return True
+
 
 
 class Role(db.Model):

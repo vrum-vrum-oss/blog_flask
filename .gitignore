@@ -1,6 +1,7 @@
 /temp.txt
 /venv/
 __pycache__/
+/.env
 # app/__pycache__/
 # app/main/__pycache__/
 # app/posts/__pycache__/
