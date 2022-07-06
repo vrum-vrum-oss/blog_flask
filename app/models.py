@@ -2,11 +2,11 @@ from . import db, login_manager
 from sqlalchemy.sql import func
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from authlib.jose import JsonWebSignature
 from flask import current_app
 
 import re
-import json
+import jwt
+import datetime
 
 def slugify(s):
     pattern = r'[\W_]+'
@@ -92,23 +92,25 @@ class User(db.Model, UserMixin):
         return User.query.get(int(user_id))
 
 
-    def generate_confirmation_token(self):
-        jws = JsonWebSignature()
-        protected = {'alg': 'HS256'}
-        payload = json.dumps({'confirm': self.id})
-        secret = bytes(current_app.config['SECRET_KEY'], encoding='utf-8')
-        return jws.serialize_compact(protected, payload, secret).decode('utf-8')
+    def generate_confirmation_token(self,expiration=3600):
+        token = jwt.encode(
+            {
+                "confirm": self.id,
+                "exp": datetime.datetime.now(tz=datetime.timezone.utc)
+                       + datetime.timedelta(seconds=expiration)
+            },
+            current_app.config['SECRET_KEY'],
+            algorithm="HS256"
+        )
+        return token
 
 
     def confirm(self, token):
-        jws = JsonWebSignature()
-        key = bytes(current_app.config['SECRET_KEY'], encoding='utf-8')
         try:
-            data = jws.deserialize_compact(token.encode('utf-8'), key) 
-            payload = json.loads(data['payload'])
-        except:
+            data = jwt.decode(token,current_app.config['SECRET_KEY'], algorithms=["HS256"])
+        except jwt.ExpiredSignatureError:
             return False
-        if payload.get('confirm') != self.id:
+        if data.get('confirm') != self.id:
             return False
         self.confirmed = True
         db.session.add(self)
