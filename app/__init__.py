@@ -19,7 +19,7 @@ migrate = Migrate()
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 login_manager.login_message_category = 'info'
-admin = Admin()
+# admin = Admin()
 
 
 
@@ -37,7 +37,7 @@ def create_app(config_name):
 
 
     from .models import Post, Tag, User, Role
-    admin.init_app(app)
+    # admin.init_app(app)
     # admin.add_view(ModelView(Post, db.session))
     # admin.add_view(ModelView(Tag, db.session))
     # admin.add_view(ModelView(User, db.session))

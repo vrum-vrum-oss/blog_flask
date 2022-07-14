@@ -150,6 +150,35 @@ class User(db.Model, UserMixin):
         return True
 
 
+    # Add helper methods self.can and self.is_admin
+    # to simplify implementation of roles and permissions
+    def can(self, perm):
+        # Check if the requested permission is present in the role
+        return self.role is not None and self.role.has_permission(perm)
+
+
+    def is_admin(self):
+        # Check for administration permissions
+        return self.can(Permission.ADMIN)
+
+
+class AnonymousUser(AnonymousUserMixin):
+    """
+    Implementing custom anonymous user class enables the app
+    to call current_user.can() and current_user.is_admin()
+    without having to check whether the user is looged in first
+    """
+    def can(self, permissions):
+        return False
+
+
+    def is_admin(self):
+        return False
+
+
+login_manager.anonymous_user = AnonymousUser
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))

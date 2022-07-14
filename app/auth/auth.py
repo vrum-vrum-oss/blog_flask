@@ -133,7 +133,8 @@ def reset_password(token):
         else:
             flash('The reset link is invalid or has expired', 'danger')
             return redirect(url_for('main.index'))
-    return render_template('auth/reset_password.html', form=form, token=token)
+    # return render_template('auth/reset_password.html', form=form, token=token)
+    return render_template('auth/reset_password.html', form=form)
     
 
 @auth_bp.before_app_request
