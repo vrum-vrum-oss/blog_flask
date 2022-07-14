@@ -145,14 +145,83 @@ def load_user(user_id):
 
 
 class Role(db.Model):
+    """
+    Users are assigned a descrete role. Each role defines what actions
+    it allows to perform through a list of permissions.
+    """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
-
+    # True only for one role which is assigned to new users upon registration
+    default = db.Column(db.Boolean, default=False, index=True)
+    permissions= db.Column(db.Integer)
     users = db.relationship('User', backref='role', lazy='dynamic')
+
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if self.permissions is None:
+            self.permissions = 0
 
 
     def __repr__(self):
         return '<Role: {}>'.format(self.name)
 
-    
 
+    def add_permission(self, perm):
+        if not self.has_permission(perm):
+            self.permissions += perm
+
+
+    def remove_permission(self, perm):
+        if self.has_permission(perm):
+            self.permissions -= perm
+
+
+    def reset_permission(self):
+        self.permissions = 0
+
+
+    def has_permission(self, perm):
+        """
+        Check if a combined permission value includes the given permission
+        using bitwise AND operator
+        """
+        return self.permissions & perm == perm
+
+
+    @staticmethod
+    def insert_roles():
+        """
+        Add roles and permissions to the database automatically
+        """
+        roles = {
+            'User':    [Permission.FOLLOW, Permission.COMMENT, Permission.WRITE],
+            'Mod':     [Permission.FOLLOW, Permission.COMMENT, Permission.WRITE,
+                        Permission.MODERATE],
+            'Admin':   [Permission.FOLLOW, Permission.COMMENT, Permission.WRITE,
+                        Permission.MODERATE, Permission.ADMIN],
+        }
+        default_role = 'User'
+        for r in roles:
+            role = Role.query.filter_by(name=r).first()
+            if role is None:
+                role = Role(name=r)
+            role.reset_permission()
+            for perm in roles[r]:
+                role.add_permission(perm)
+            role.default = (role.name == default_role)
+            db.session.add(role)
+        db.session.commit()
+
+    
+class Permission:
+    """ 
+    Permission values are stored as powers of two. It allows permissions
+    to be combined, giving each possible combination of permissions
+    a unique value
+    """
+    FOLLOW = 1
+    COMMENT = 2
+    WRITE = 4
+    MODERATE = 8
+    ADMIN = 16
