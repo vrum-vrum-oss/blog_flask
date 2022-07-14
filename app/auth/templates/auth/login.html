@@ -2,12 +2,12 @@
 
 
 {% block title %}
-Login
+Log in
 {% endblock %}
 
 
 {% block content_title %}
-Login
+Log in
 {% endblock %}
 
 
@@ -34,10 +34,8 @@ Login
 </form>
 
 <p>
-    or
-    <a href="{{ url_for('auth.register') }}">
-    click here
-    </a> to register
+    Forgot your password? <a href="{{ url_for('auth.reset_password_request') }}">Click here</a> to reset it<br>
+    New user? <a href="{{ url_for('auth.register') }}">Click here</a> to register
 </p>
 
 {% endblock %}

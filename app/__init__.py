@@ -18,6 +18,7 @@ db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
+login_manager.login_message_category = 'info'
 admin = Admin()
 
 
@@ -31,7 +32,7 @@ def create_app(config_name):
     bootstrap.init_app(app)
     mail.init_app(app)
     db.init_app(app)
-    migrate.init_app(app, db)
+    migrate.init_app(app, db, compare_type=True)
     login_manager.init_app(app)
 
 

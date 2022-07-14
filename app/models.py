@@ -87,11 +87,6 @@ class User(db.Model, UserMixin):
         return check_password_hash(self.password_hash, password)
 
 
-    @login_manager.user_loader
-    def load_user(user_id):
-        return User.query.get(int(user_id))
-
-
     def generate_confirmation_token(self,expiration=3600):
         token = jwt.encode(
             {
@@ -107,7 +102,7 @@ class User(db.Model, UserMixin):
 
     def confirm(self, token):
         try:
-            data = jwt.decode(token,current_app.config['SECRET_KEY'], algorithms=["HS256"])
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
             return False
         if data.get('confirm') != self.id:
@@ -116,6 +111,37 @@ class User(db.Model, UserMixin):
         db.session.add(self)
         return True
 
+
+    def generate_reset_token(self, expiration=3600):
+        token = jwt.encode(
+            {
+                "reset": self.id,
+                "exp": datetime.datetime.now(tz=datetime.timezone.utc)
+                       + datetime.timedelta(seconds=expiration)
+            },
+            current_app.config['SECRET_KEY'],
+            algorithm="HS256"
+        )
+        return token
+
+
+    @staticmethod
+    def reset_password(token, new_password):
+        try:
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
+        except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
+            return False
+        user = User.query.get(data.get('reset'))
+        if user is None:
+            return False
+        user.password = new_password
+        db.session.add(user)
+        return True
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 class Role(db.Model):
