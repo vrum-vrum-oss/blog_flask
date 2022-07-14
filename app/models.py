@@ -1,7 +1,7 @@
 from . import db, login_manager
 from sqlalchemy.sql import func
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
+from flask_login import UserMixin, AnonymousUserMixin
 from flask import current_app
 
 import re
@@ -67,6 +67,17 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(128))
     role_id =db.Column(db.Integer, db.ForeignKey('role.id'))
     confirmed = db.Column(db.Boolean, default=False)
+
+
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        if self.role is None:
+            # set the admin or default role depending on email address
+            if self.email == current_app.config['FLASKY_ADMIN']:
+                self.role = Role.query.filter_by(name='Admin').first()
+            if self.role is None:
+                self.role = Role.query.filter_by(default=True).first()
+
 
 
     def __repr__(self):
