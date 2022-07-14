@@ -4,7 +4,7 @@ from flask_login import login_required, login_user, logout_user, current_user
 from . import auth_bp
 from ..import db
 from ..models import User
-from .forms import LoginForm, RegistrationForm
+from .forms import LoginForm, RegistrationForm, UpdatePasswordForm
 from ..email import send_email
 
 
@@ -19,7 +19,6 @@ def login():
             next = request.args.get('next')
             if next is None or not next.startswith('/'):
                 next = url_for('main.index')
-            flash('You are now logged in', 'success')
             return redirect(next)
         flash('Invalid email or password', 'danger')
 
@@ -84,6 +83,23 @@ def unconfirmed():
     if current_user.is_anonymous or current_user.confirmed:
         return redirect(url_for('main.index'))
     return render_template('auth/unconfirmed.html')
+
+
+@auth_bp.route('/update_password', methods=['GET', 'POST'])
+@login_required
+def update_password():
+    form = UpdatePasswordForm()
+
+    if form.validate_on_submit():
+        if current_user.verify_password(form.current_password.data):
+            current_user.password = form.new_password.data
+            db.session.add(current_user)
+            db.session.commit()
+            flash('You have successfully changed your password', 'success')
+            return redirect(url_for('auth.update_password'))
+        flash('Invalid current password', 'danger')
+        
+    return render_template('auth/update_password.html', form=form)
 
 
 @auth_bp.before_app_request

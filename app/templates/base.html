@@ -11,7 +11,7 @@
     <title>
         {% block title %}
 
-        {% endblock %} | Flask app
+        {% endblock %} | Flasky Blog
     </title>
 </head>
 
@@ -25,23 +25,36 @@
                 aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-1 mb-lg-0">
+            <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
+                <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" href=" {{ url_for('posts.view') }} ">Blog</a>
+                        <a class="nav-link active flex-grow-1" href=" {{ url_for('posts.view') }} ">Blog</a>
                     </li>
                 </ul>
 
-                <form class="d-flex" role="search" method="GET">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q" value="{{ request.args.get('q', '') }}">
-                    <button class="btn btn-outline-light" type="submit">Search</button>
-                </form>
+                    <form class="d-flex" role="search" method="GET">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q" value="{{ request.args.get('q', '') }}">
+                        <button class="btn btn-outline-light" type="submit">Search</button>
+                    </form>
 
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav">
                     {% if current_user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Log Out</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.logout') }}">Log Out</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" id="navbarDropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">Account</a>
+                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+                            <li><a class="dropdown-item" href="{{ url_for('auth.update_password') }}">Update Password</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Log Out</a></li>
+                        </ul>
+                    </li>
+                    
+
                     {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a>
+                    </li>
                     {% endif %}
                 </ul>
 
@@ -79,8 +92,8 @@
         </div>
     </div>
 
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" 
-    integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" 
+    integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
 </body>
 
 </html>
