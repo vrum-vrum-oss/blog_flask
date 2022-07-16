@@ -6,7 +6,7 @@ from flask import current_app
 
 import re
 import jwt
-import datetime
+from datetime import datetime, timezone
 
 def slugify(s):
     pattern = r'[\W_]+'
@@ -67,13 +67,18 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(128))
     role_id =db.Column(db.Integer, db.ForeignKey('role.id'))
     confirmed = db.Column(db.Boolean, default=False)
+    name = db.Column(db.String(64))
+    location = db.Column(db.String(64))
+    about_me = db.Column(db.Text())
+    member_since = db.Column(db.DateTime(), default=func.now())
+    last_seen = db.Column(db.DateTime(), default=func.now())
 
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         if self.role is None:
             # set the admin or default role depending on email address
-            if self.email == current_app.config['FLASKY_ADMIN']:
+            if self.email == current_app.config['BLOG_ADMIN']:
                 self.role = Role.query.filter_by(name='Admin').first()
             if self.role is None:
                 self.role = Role.query.filter_by(default=True).first()
@@ -160,6 +165,12 @@ class User(db.Model, UserMixin):
     def is_admin(self):
         # Check for administration permissions
         return self.can(Permission.ADMIN)
+
+
+    def ping(self):
+        self.last_seen = func.now()
+        db.session.add(self)
+        db.session.commit()
 
 
 class AnonymousUser(AnonymousUserMixin):

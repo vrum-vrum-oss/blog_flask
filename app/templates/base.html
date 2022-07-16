@@ -6,7 +6,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     {% block head %}
-    
+        <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"
+        type="image/x-icon">
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"
+        type="image/x-icon">
     {% endblock %}
     <title>
         {% block title %}
@@ -28,8 +31,15 @@
             <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active flex-grow-1" href=" {{ url_for('posts.view') }} ">Blog</a>
+                        <a class="nav-link active" href=" {{ url_for('posts.view') }} ">Blog</a>
                     </li>
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('user.user', username=current_user.username) }}">
+                            Profile
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
 
                     <form class="d-flex" role="search" method="GET">
@@ -92,8 +102,11 @@
         </div>
     </div>
 
+    {% block scripts %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" 
     integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+    {{ moment.include_moment() }}
+    {% endblock %}
 </body>
 
 </html>

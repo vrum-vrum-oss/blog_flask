@@ -9,6 +9,7 @@ class UserModelTestCase(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
+        Role.insert_roles()
 
 
     def tearDown(self):
@@ -95,7 +96,7 @@ class UserModelTestCase(unittest.TestCase):
 
 
     def test_moderator_role(self):
-        r = Role.query.filter_by(name='Moderator').first()
+        r = Role.query.filter_by(name='Mod').first()
         u = User(email='john@example.com', password='cat', role=r)
         self.assertTrue(u.can(Permission.FOLLOW))
         self.assertTrue(u.can(Permission.COMMENT))
@@ -105,7 +106,7 @@ class UserModelTestCase(unittest.TestCase):
 
 
     def test_administrator_role(self):
-        r = Role.query.filter_by(name='Administrator').first()
+        r = Role.query.filter_by(name='Admin').first()
         u = User(email='john@example.com', password='cat', role=r)
         self.assertTrue(u.can(Permission.FOLLOW))
         self.assertTrue(u.can(Permission.COMMENT))
