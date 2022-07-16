@@ -11,15 +11,15 @@ def index():
     return render_template('main/index.html')
 
 
-@main_bp.route('/admin')
-@login_required
-@admin_required
-def for_admins_only():
-    return "For admins!"
+# @main_bp.route('/admin')
+# @login_required
+# @admin_required
+# def for_admins_only():
+#     return "For admins!"
 
 
-@main_bp.route('/moderate')
-@login_required
-@permission_required(Permission.MODERATE)
-def for_moderators_only():
-    return "For comment moderators!"
+# @main_bp.route('/moderate')
+# @login_required
+# @permission_required(Permission.MODERATE)
+# def for_moderators_only():
+#     return "For comment moderators!"

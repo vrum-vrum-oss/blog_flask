@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+    Edit Profile
+{% endblock %}
+
+
+{% block content_title %}
+    Edit Your Profile
+{% endblock %}
+
+
+{% block content %}
+
+    <form role="form" action="{{ url_for('user.edit_profile') }}" method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group col-md-6 mb-3">
+            {{ form.name.label(class='control-label') }}
+            {{ form.name(class='form-control') }}
+        </div>
+
+        <div class="form-group col-md-6 mb-3">
+            {{ form.location.label(class='control-label') }}
+            {{ form.location(class='form-control') }}
+        </div>
+
+        <div class="form-group col-md-6 mb-1">
+            {{ form.about_me.label(class='control-label') }}
+            {{ form.about_me(class='form-control') }}
+        </div>
+            {{ form.submit(class='btn btn-success', style='margin-top: 8px') }}
+    </form>
+
+{% endblock %}

@@ -1,5 +1,4 @@
 from flask import Flask
-from sqlalchemy import true
 from config import config
 
 from flask_bootstrap import Bootstrap
@@ -22,7 +21,7 @@ moment = Moment()
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 login_manager.login_message_category = 'info'
-# admin = Admin()
+admin = Admin()
 
 
 
@@ -40,12 +39,6 @@ def create_app(config_name):
     login_manager.init_app(app)
 
 
-    from .models import Post, Tag, User, Role
-    # admin.init_app(app)
-    # admin.add_view(ModelView(Post, db.session))
-    # admin.add_view(ModelView(Tag, db.session))
-    # admin.add_view(ModelView(User, db.session))
-    # admin.add_view(ModelView(Role, db.session))
 
 
     from .main import main_bp
@@ -61,7 +54,15 @@ def create_app(config_name):
 
 
     from .user import user_bp
-    app.register_blueprint(user_bp)
+    app.register_blueprint(user_bp, url_prefix='/user')
 
 
+    from .models import Post, Tag, User, Role
+    admin.init_app(app)
+    admin.add_view(ModelView(Post, db.session))
+    admin.add_view(ModelView(Tag, db.session))
+    admin.add_view(ModelView(User, db.session, endpoint="users"))
+    admin.add_view(ModelView(Role, db.session))
+    
+    
     return app

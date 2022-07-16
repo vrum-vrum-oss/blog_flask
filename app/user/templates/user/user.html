@@ -1,14 +1,5 @@
 {% extends "base.html" %}
 
-
-<!-- ???????????????????? -->
-<!-- {% block head %}
-{{ moment.include_moment() }}
-{% endblock %} -->
-
-
-
-
 {% block title %}
     {{ user.username }}
 {% endblock %}
@@ -32,6 +23,13 @@
         {% endif %}
         {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
         <p>Member since {{ moment(user.member_since).format('L') }}. Last seen {{ moment(timestamp=user.last_seen, local=true).fromNow() }}.</p>
+    
+        {% if user == current_user %}
+        <div>
+            <a class="btn btn-success" href="{{ url_for('user.edit_profile') }}" role="button">Edit Profile</a>
+        </div>
+        {% endif %}
     </div>
 
 {% endblock %}
+
