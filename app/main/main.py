@@ -1,3 +1,4 @@
+from flask import redirect, url_for
 from flask_login import login_remembered, login_required
 
 from app.decorators import admin_required, permission_required
@@ -11,11 +12,11 @@ def index():
     return render_template('main/index.html')
 
 
-# @main_bp.route('/admin')
+# @admin.route('/admin', methods=['GET', 'POST'])
 # @login_required
 # @admin_required
-# def for_admins_only():
-#     return "For admins!"
+# def index():
+#     return redirect(url_for('index'))
 
 
 # @main_bp.route('/moderate')

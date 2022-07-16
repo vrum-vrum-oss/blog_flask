@@ -145,3 +145,5 @@ def before_request():
                 and request.blueprint != 'auth'\
                 and request.endpoint != 'static':
             return redirect(url_for('auth.unconfirmed'))
+    # if current_user.is_admin:
+    #     and request.blueprint != 'admin'\
