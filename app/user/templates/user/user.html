@@ -1,34 +1,46 @@
 {% extends "base.html" %}
 
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+{% endblock %}
+
+
 {% block title %}
     {{ user.username }}
 {% endblock %}
 
 {% block content_title %}
-    {{ user.username }}
+    Profile page
 {% endblock %}
 
 {% block content %}
-    <div class="main-content">
-        {% if user.name or user.location %}
-        <p>
-            {% if user.name %}{{ user.name }}{% endif %}
-            {% if user.location %}
+    <div class="main-content" >
+        <!-- style="display:flex;" -->
+        <img class="profile-thumbnail " src="{{ user.gravatar(size=256) }}">
+        <div class="profile-header">
+            <h1>{{ user.username}}</h1>
+            {% if user.name or user.location %}
+            <p>
+                {% if user.name %}{{ user.name }}{% endif %}
+                {% if user.location %}
                 from <a href="http://maps.google.com/?q={{ user.location }}">{{ user.location }}</a>
+                {% endif %}
+            </p>
             {% endif %}
-        </p>
-        {% endif %}
-        {% if current_user.is_admin() %}
-        <p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
-        {% endif %}
-        {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
-        <p>Member since {{ moment(user.member_since).format('L') }}. Last seen {{ moment(timestamp=user.last_seen, local=true).fromNow() }}.</p>
+            {% if current_user.is_admin() %}
+            <p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
+            {% endif %}
+            {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
+            <p>Member since {{ moment(user.member_since).format('L') }}. Last seen {{ moment(timestamp=user.last_seen,
+                local=true).fromNow() }}.</p>
     
-        {% if user == current_user %}
-        <div>
-            <a class="btn btn-success" href="{{ url_for('user.edit_profile') }}" role="button">Edit Profile</a>
+            {% if user == current_user %}
+            <div>
+                <a class="btn btn-outline-dark" href="{{ url_for('user.edit_profile') }}" role="button">Edit Profile</a>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
 
 {% endblock %}
