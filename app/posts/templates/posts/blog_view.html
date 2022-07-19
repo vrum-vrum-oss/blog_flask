@@ -1,12 +1,10 @@
 {% extends 'base.html' %}
 {% import 'posts/_page_navigation.html' as macros %}
 
-
 {% block head %}
 {{ super() }}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 {% endblock %}
-
 
 {% block title %}
 Blog

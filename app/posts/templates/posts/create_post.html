@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+{% endblock %}
+
 
 {% block title %}
 Create new post
@@ -27,4 +32,9 @@ New post
         {{ form.submit(class='btn btn-success', style='margin-top: 8px') }}
     </form>
 
+{% block scripts %}
+    {{ super() }}
+    {{ pagedown.include_pagedown() }}
+{% endblock %}
+    
 {% endblock %}

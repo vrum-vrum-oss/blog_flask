@@ -12,9 +12,6 @@
 
 
 {% block content %}
-    <div class="main-content">
-        {{ post.body }}
-    </div>
 
     {% if tags %}
     <div class="tags">
@@ -30,6 +27,14 @@
             </tr>
         </table>
     {% endif %}
+
+    <div class='post-body'>
+        {% if post.body_html %}
+            {{post.body_html | safe }}
+        {% else %}
+            {{ post.body }}
+        {% endif %}
+    </div>
     
     </div>
 {% endblock %}
