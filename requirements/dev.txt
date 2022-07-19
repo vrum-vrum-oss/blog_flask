@@ -1,0 +1,2 @@
+-r common.txt
+faker==13.15.0

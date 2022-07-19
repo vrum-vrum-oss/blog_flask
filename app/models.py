@@ -7,7 +7,7 @@ from flask import current_app
 import re
 import jwt
 import hashlib
-from datetime import datetime, timezone
+import datetime
 
 
 def slugify(s):
