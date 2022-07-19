@@ -13,6 +13,7 @@ class Config:
     BLOG_MAIL_SENDER = os.environ.get('BLOG_MAIL_SENDER')
     BLOG_ADMIN = os.environ.get('BLOG_ADMIN')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    BLOG_POSTS_PER_PAGE = 5
     
     @staticmethod
     def init_app(app):

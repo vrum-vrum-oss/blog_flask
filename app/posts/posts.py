@@ -1,6 +1,6 @@
 from flask_login import login_required
 from . import posts_bp
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, current_app
 from flask_login import current_user
 from .. import db
 from ..models import Permission, Post, Tag
@@ -9,21 +9,17 @@ from .forms import PostForm
 @posts_bp.route('/')
 def view():
     q = request.args.get('q')
-    page = request.args.get('page')
-
-    if page and page.isdigit():
-        page = int(page)
-    else:
-        page = 1
+    page = request.args.get('page', 1, type=int)
     
     if q:
         posts = Post.query.filter(Post.title.contains(q) | Post.body.contains(q)).order_by(Post.created.desc())#.all()
     else:
         posts = Post.query.order_by(Post.created.desc())#.all()
     
-    pages = posts.paginate(page=page, per_page=4)
-    
-    return render_template('posts/blog_view.html', pages=pages)
+    pages = posts.paginate(page=page, per_page=current_app.config['BLOG_POSTS_PER_PAGE'], error_out=False)
+    posts = pages.items
+
+    return render_template('posts/blog_view.html', pages=pages, posts=posts)
 
 
 

@@ -50,3 +50,13 @@ div.post-body {
 .pagination {
   margin-top: 1rem
 }
+
+.pagination > .active > a {
+    color: white;
+    background-color: #292b2c;
+    border: solid 1px #292b2c;
+}
+
+.pagination > a {
+  color: white;
+}

@@ -1,18 +1,30 @@
-from flask import render_template, redirect, request, url_for, flash
+from flask import render_template, redirect, request, url_for, flash, current_app
 from flask_login import login_required, login_user, logout_user, current_user
 
 from .forms import EditProfileForm
 
 from . import user_bp
 from ..import db
-from ..models import User
+from ..models import User, Post
 
 
 
 @user_bp.route('/<username>')
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    return render_template('user.html', user=user)
+    page = request.args.get('page', 1, type=int)
+    pages = user.posts.order_by(Post.created.desc()).paginate(
+        page, per_page=current_app.config['BLOG_POSTS_PER_PAGE'],
+        error_out=False)
+    posts = pages.items
+    return render_template('user.html', user=user, pages=pages, posts=posts)
+
+    # if page and page.isdigit():
+    #     page = int(page)
+    # else:
+    #     page = 1
+    # pages = posts.paginate(page=page, per_page=2)
+    # return render_template('user.html', user=user, pages=pages)
 
 
 @user_bp.route('/edit_profile', methods=['GET', 'POST'])

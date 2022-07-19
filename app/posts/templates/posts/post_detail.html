@@ -16,6 +16,7 @@
         {{ post.body }}
     </div>
 
+    {% if tags %}
     <div class="tags">
         <table>
             <tr>
@@ -28,6 +29,7 @@
                 {% endfor %}
             </tr>
         </table>
+    {% endif %}
     
     </div>
 {% endblock %}

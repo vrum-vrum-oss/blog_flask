@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "posts/_page_navigation.html" as macros %}
 
 {% block head %}
 {{ super() }}
@@ -40,7 +41,14 @@
             </div>
             {% endif %}
         </div>
-    </div>
+
+        <h3>Posts by {{ user.username }} </h3>
+        {% include 'posts/_posts.html' %}
+        {% if pages %}
+            <div>
+                {{ macros.pagination_widget(pages, 'user.user', username=user.username) }}
+            </div>
+        {% endif %}
 
 {% endblock %}
 
