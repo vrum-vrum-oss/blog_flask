@@ -28,8 +28,8 @@ class Post(db.Model):
     title = db.Column(db.String(140))
     slug = db.Column(db.String(140), unique=True)
     body = db.Column(db.Text)
-    created = db.Column(db.DateTime, default=func.now())
-
+    created = db.Column(db.DateTime, default=func.now(), index=True)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     tags = db.relationship('Tag', secondary=post_tags, backref=db.backref('posts', lazy='dynamic'))
 
 
@@ -75,6 +75,7 @@ class User(db.Model, UserMixin):
     member_since = db.Column(db.DateTime(), default=func.now())
     last_seen = db.Column(db.DateTime(), default=func.now())
     avatar_hash = db.Column(db.String(32))
+    posts = db.relationship('Post', backref='author', lazy='dynamic')
 
 
     def __init__(self, **kwargs) -> None:

@@ -1,8 +1,9 @@
 from flask_login import login_required
 from . import posts_bp
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, flash
+from flask_login import current_user
 from .. import db
-from ..models import Post, Tag
+from ..models import Permission, Post, Tag
 from .forms import PostForm
 
 @posts_bp.route('/')
@@ -20,7 +21,7 @@ def view():
     else:
         posts = Post.query.order_by(Post.created.desc())#.all()
     
-    pages = posts.paginate(page=page, per_page=3)
+    pages = posts.paginate(page=page, per_page=4)
     
     return render_template('posts/blog_view.html', pages=pages)
 
@@ -28,20 +29,15 @@ def view():
 
 @posts_bp.route('/create', methods=['GET', 'POST'])
 def create_post():
-    if request.method == 'POST':
-        title = request.form['title']
-        body = request.form['body']
-
-        try:
-            post = Post(title=title, body=body)
-            db.session.add(post)
-            db.session.commit()
-        except:
-            print('Something wrong')
-
+    form = PostForm()
+    
+    if current_user.can(Permission.WRITE) and form.validate_on_submit():
+        post = Post(title=form.title.data, body=form.body.data,
+                    author=current_user._get_current_object())
+        db.session.add(post)
+        db.session.commit()
         return redirect(url_for('posts.view'))
 
-    form = PostForm()
     return render_template('posts/create_post.html', form=form)
 
 

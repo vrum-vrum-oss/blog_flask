@@ -10,11 +10,12 @@
         border: solid 1px #292b2c;
     }
 </style>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 {% endblock %}
 
 
 {% block title %}
-Blog page
+Blog
 {% endblock %}
 
 
@@ -25,17 +26,41 @@ Posts
 
 {% block content %}
 
+
+{% if current_user.is_authenticated %}
 <div>
-    <a class="btn btn-success" href="{{ url_for('posts.create_post') }}" role="button" style="margin-bottom: 8px">New
+    <a class="btn btn-outline-dark" href="{{ url_for('posts.create_post') }}" role="button" style="margin-bottom: 8px">New
         post</a>
 </div>
+{% endif %}
 
+
+<ul class='posts'>
 {% for post in pages.items %}
-<p>
-    <a href="{{ url_for('posts.post_detail', slug=post.slug) }}"> {{ post.title }} </a><br>
-    (created: {{ post.created }})
-</p>
+<li class='post'>
+    <div class="profile-thumbnail">
+        <a href="{{ url_for('user.user', username=post.author.username) }}">
+            <img class="profile-thumbnail" src="{{ post.author.gravatar(size=40) }}">
+        </a>
+    </div>
+    <div class='post-date'>
+        {{ moment(post.created, local=true).format('LL [at] HH:mm') }}
+    </div>
+    <div class='post-author'>
+        <a href="{{ url_for('user.user', username=post.author.username) }}">
+            {{ post.author.username }}
+        </a>
+    </div>
+    <div class='post-title'>
+        {{ post.title }}
+    </div>
+    <div class='post-body'>
+        {{ post.body }}
+    </div>
+</li>
 {% endfor %}
+</ul>
+
 
 <nav aria-label="Page navigation">
     <ul class="pagination justify-content-center">
