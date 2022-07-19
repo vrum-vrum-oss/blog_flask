@@ -37,18 +37,18 @@ class Post(db.Model):
     tags = db.relationship('Tag', secondary=post_tags, backref=db.backref('posts', lazy='dynamic'))
 
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.generate_slug()
+    # def __init__(self, *args, **kwargs):
+        # super().__init__(*args, **kwargs)
+        # self.generate_slug()
 
 
     def __repr__(self):
         return '<Post id: {}, title: {}>'.format(self.id, self.title)
 
 
-    def generate_slug(self):
-        if self.title:
-            self.slug = slugify(self.title)
+    # def generate_slug(self):
+    #     if self.title:
+    #         self.slug = slugify(self.title)
             
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):
@@ -58,8 +58,20 @@ class Post(db.Model):
         target.body_html = bleach.linkify(bleach.clean(
             markdown(value, output_format='html'),
             tags=allowed_tags, strip=True))
+        
 
 db.event.listen(Post.body, 'set', Post.on_changed_body)
+
+@db.event.listens_for(Post, "after_insert")
+def after_insert(mapper, connection, target):
+    link_table = Post.__table__
+    slug = slugify(target.title) + '_' + str(target.id)
+    if target.slug is None:
+        connection.execute(
+            link_table.update().
+            where(link_table.c.id==target.id).
+            values(slug=slug)
+        )
 
 
 class Tag(db.Model):

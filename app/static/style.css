@@ -48,6 +48,10 @@ div.post-body {
   min-height: 48px;
 }
 
+div.post-footer {
+  text-align: right;
+}
+
 .pagination {
   margin-top: 1rem
 }

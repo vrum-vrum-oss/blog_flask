@@ -15,7 +15,7 @@ def users(count=10):
                  confirmed=True,
                  name=fake.name(),
                  location=fake.city(),
-                 about_me=fake.text(),
+                 about_me=fake.text(max_nb_chars=100),
                  member_since=fake.past_datetime().strftime('%Y-%m-%d %H:%M:%S'),
                  last_seen=fake.past_datetime().strftime('%Y-%m-%d %H:%M:%S'),
                 )
@@ -33,7 +33,7 @@ def posts(count=10):
     for i in range(count):
         u = User.query.offset(randint(0, user_count - 1)).first()
         p = Post(title=fake.sentence(),
-                 body=fake.text(),
+                 body=fake.text(max_nb_chars=1000),
                  created=fake.past_datetime(),
                  author=u,
                 )
