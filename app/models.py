@@ -111,7 +111,7 @@ class User(db.Model, UserMixin):
     member_since = db.Column(db.DateTime(), default=func.now())
     last_seen = db.Column(db.DateTime(), default=func.now())
     avatar_hash = db.Column(db.String(32))
-    posts = db.relationship('Post', backref='author', lazy='dynamic')
+    posts = db.relationship('Post', backref='author', lazy='dynamic', cascade="all, delete-orphan")
     followed = db.relationship('Follow',
                                 foreign_keys=[Follow.follower_id],
                                 backref=db.backref('follower', lazy='joined'),
@@ -266,7 +266,7 @@ class AnonymousUser(AnonymousUserMixin):
     to call current_user.can() and current_user.is_admin()
     without having to check whether the user is looged in first
     """
-    def can(self, permissions):
+    def can(self, perm):
         return False
 
 

@@ -35,6 +35,24 @@
             {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
             <p>Member since {{ moment(user.member_since, local=true).format('L') }}. Last seen {{ moment(timestamp=user.last_seen, local=true).fromNow() }}.</p>
     
+            <p>
+                {% if current_user.can(Permission.FOLLOW) and user != current_user %}
+                    {% if not current_user.is_following(user) %}
+                    <a href="{{ url_for('user.follow', username=user.username) }}" class="btn btn-dark">Follow</a>
+                    {% else %}
+                    <a href="{{ url_for('user.unfollow', username=user.username) }}" class="btn btn-outline-dark">Unfollow</a>
+                    {% endif %}
+                {% endif %}
+                
+                <a href="{{ url_for('user.followers', username=user.username) }}">Followers: {{ user.followers.count() }}</a>
+                <a href="{{ url_for('user.followed_by', username=user.username) }}">Following: {{ user.followed.count() }}</a>
+                
+
+                {% if current_user.is_authenticated and user != current_user and user.is_following(current_user) %}
+                | <span class="badge text-bg-secondary">Follows you</span>
+                {% endif %}
+            </p>
+
             {% if user == current_user %}
             <div>
                 <a class="btn btn-outline-dark" href="{{ url_for('user.edit_profile') }}" role="button">Edit Profile</a>

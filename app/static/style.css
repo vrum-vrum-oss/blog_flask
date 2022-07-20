@@ -48,18 +48,7 @@ div.post-body {
   min-height: 48px;
 }
 
-/* div.post-footer { */
-  /* text-align: right; */
-  /* float:right; */
-  /* margin:auto; */
-  /* position: relative;
-  right: 0px; */
-  /* display: inline-table */
-/* } */
-
-/* width: auto;
-        display: inline-table; */
-  div.post-footer > table.right {
+div.post-footer > table.right {
   margin-left: auto;
   margin-right: 0px;
 }
