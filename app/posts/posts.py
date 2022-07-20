@@ -1,6 +1,6 @@
 from flask_login import login_required
 from . import posts_bp
-from flask import render_template, request, redirect, url_for, flash, current_app
+from flask import render_template, request, redirect, url_for, flash, current_app, abort
 from flask_login import current_user
 from .. import db
 from ..models import Permission, Post, Tag
@@ -40,15 +40,20 @@ def create_post():
 @posts_bp.route('/<slug>/edit/', methods=['GET', 'POST'])
 def edit_post(slug):
     post = Post.query.filter_by(slug=slug).first()
+    
+    if current_user != post.author and \
+        not current_user.can(Permission.ADMIN):
+            abort(403)
 
-    if request.method == 'POST':
+    form = PostForm(obj=post)
+    
+    if form.validate_on_submit():
         form = PostForm(formdata=request.form, obj=post)
         form.populate_obj(post)
         db.session.commit()
-
+        flash('The post has been updated', 'success')
         return redirect(url_for('posts.post_detail', slug=post.slug))
 
-    form = PostForm(obj=post)
     return render_template('posts/edit_post.html', post=post, form=form)
 
 

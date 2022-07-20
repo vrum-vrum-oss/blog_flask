@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 
 
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+{% endblock %}
+
+
 {% block title %}
     Edit post
 {% endblock %}
@@ -22,9 +28,14 @@
 
         <div class="form-group col-md-6 mb-1">
             {{ form.body.label(class='control-label') }}
-            {{ form.body(class='form-control') }}
+            {{ form.body(class='form-control', style='height: 200px;') }}
         </div>
-            {{ form.submit(class='btn btn-success', style='margin-top: 8px', value='Edit') }}
+            {{ form.submit(class='btn btn-success', style='margin-top: 8px;', value='Edit') }}
     </form>
+
+{% block scripts %}
+    {{ super() }}
+    {{ pagedown.include_pagedown() }}
+{% endblock %}
 
 {% endblock %}

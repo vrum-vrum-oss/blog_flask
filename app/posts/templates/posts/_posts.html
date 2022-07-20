@@ -26,9 +26,22 @@
                 {% endif %}
             </div>
             <div class='post-footer'>
-                <a href="{{ url_for('posts.post_detail', slug=post.slug) }}">
-                    <span class="label label-default">Permalink</span>
-                </a>
+                <table class='right'>
+                    <tr>
+                {% if current_user == post.author %}
+                <td><a href="{{ url_for('posts.edit_post', slug=post.slug) }}">
+                    <span class="badge text-bg-primary">Edit</span>
+                </a></td>
+                {% elif current_user.is_admin() %}
+                <td><a href="{{ url_for('posts.edit_post', slug=post.slug) }}">
+                    <span class="badge text-bg-danger">Edit [Admin]</span>
+                </a></td>
+                {% endif %}
+                <td><a href="{{ url_for('posts.post_detail', slug=post.slug) }}">
+                    <span class="badge text-bg-secondary">Detail</span>
+                </a></td>
+                    </tr>
+                </table>
             </div>
         </div>
     </li>
