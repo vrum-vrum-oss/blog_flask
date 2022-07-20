@@ -9,7 +9,7 @@ from flask_admin.menu import MenuLink
 from . import db
 
 
-from .models import Post, Tag, User, Role
+from .models import Post, Tag, User, Role, Comment
 
 
 class MyAdminIndexView(AdminIndexView):
@@ -34,4 +34,6 @@ admin.add_view(AdminModelView(Post, db.session, endpoint="post"))
 admin.add_view(AdminModelView(Tag, db.session))
 admin.add_view(AdminModelView(User, db.session, endpoint="users"))
 admin.add_view(AdminModelView(Role, db.session))
+admin.add_view(AdminModelView(Comment, db.session))
+
 admin.add_link(MenuLink(name='Public Website', url='/'))

@@ -8,3 +8,8 @@ class PostForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     body = PageDownField('Body', validators=[DataRequired()])
     submit = SubmitField('Create')
+    
+    
+class CommentForm(FlaskForm):
+    body = TextAreaField('Enter your comment', validators=[DataRequired()])
+    submit = SubmitField('Comment')

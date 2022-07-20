@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
+{% import "posts/_page_navigation.html" as macros %}
 
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+{% endblock %}
 
 {% block title %}
     Post detail
@@ -7,7 +12,7 @@
 
 
 {% block content_title %}
-    {{ post.title }}
+    Post detail
 {% endblock %}
 
 
@@ -26,15 +31,32 @@
                 {% endfor %}
             </tr>
         </table>
+    </div>
     {% endif %}
 
-    <div class='post-body'>
-        {% if post.body_html %}
-            {{post.body_html | safe }}
-        {% else %}
-            {{ post.body }}
-        {% endif %}
+    {% include 'posts/_posts.html' %}
+
+    <h4 id="comments" style="margin-top: 10px">Comments</h4>
+    {% if current_user.can(Permission.COMMENT) %}
+    <div class="comment-form">
+        <form role="form" method="POST">
+            {{ form.hidden_tag() }}
+            <div class="form-group col-md-6">
+                {{ form.body.label(class='control-label') }}
+                {{ form.body(class='form-control') }}
+            </div>
+            {{ form.submit(class='btn btn-outline-dark', style='margin-top: 8px') }}
+        </form>
     </div>
+    {% endif %}
+    {% include 'posts/_comments.html' %}
     
+    {% if pages %}
+    <div>
+        {{ macros.pagination_widget(pages, 'posts.post_detail', fragment='#comments', slug=posts[0].slug) }}
     </div>
+    {% endif %}
+
 {% endblock %}
+
+

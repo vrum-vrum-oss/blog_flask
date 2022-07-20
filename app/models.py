@@ -44,6 +44,7 @@ class Post(db.Model):
     tags = db.relationship('Tag', secondary=post_tags,
                            backref=db.backref('posts', lazy='dynamic'),
                            lazy='dynamic')
+    comments = db.relationship('Comment', backref='post', lazy='dynamic', cascade="all, delete-orphan")
 
 
     # def __init__(self, *args, **kwargs):
@@ -122,6 +123,7 @@ class User(db.Model, UserMixin):
                                  backref=db.backref('followed', lazy='joined'),
                                  lazy='dynamic',
                                  cascade='all, delete-orphan')
+    comments = db.relationship('Comment', backref='author', lazy='dynamic')
 
 
 
@@ -371,3 +373,13 @@ class Permission:
     WRITE = 4
     MODERATE = 8
     ADMIN = 16
+
+
+class Comment(db.Model):
+    __tablename__ = 'comment'
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.datetime.utcnow)
+    disabled = db.Column(db.Boolean)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))

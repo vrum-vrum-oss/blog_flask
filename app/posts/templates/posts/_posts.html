@@ -38,7 +38,10 @@
                 </a></td>
                 {% endif %}
                 <td><a href="{{ url_for('posts.post_detail', slug=post.slug) }}">
-                    <span class="badge text-bg-secondary">Detail</span>
+                    <span class="badge text-bg-dark">Detail</span>
+                </a></td>
+                <td><a href="{{ url_for('posts.post_detail', slug=post.slug) }}#comments">
+                    <span class="badge text-bg-dark">{{ post.comments.count() }} Comments</span>
                 </a></td>
                     </tr>
                 </table>

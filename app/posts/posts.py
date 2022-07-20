@@ -3,8 +3,8 @@ from . import posts_bp
 from flask import render_template, request, redirect, url_for, flash, current_app, abort, make_response
 from flask_login import current_user
 from .. import db
-from ..models import Permission, Post, Tag
-from .forms import PostForm
+from ..models import Permission, Post, Tag, Comment
+from .forms import PostForm, CommentForm
 
 @posts_bp.route('/')
 def view():
@@ -64,11 +64,65 @@ def edit_post(slug):
     return render_template('posts/edit_post.html', post=post, form=form)
 
 
-@posts_bp.route('/<slug>')
+@posts_bp.route('/<slug>', methods=['GET', 'POST'])
 def post_detail(slug):
     post = Post.query.filter_by(slug=slug).first()
     tags = post.tags
-    return render_template('posts/post_detail.html', post=post, tags=tags)
+    form = CommentForm()
+    
+    if form.validate_on_submit():
+        comment = Comment(body=form.body.data,
+                          post=post,
+                          author=current_user._get_current_object())
+        db.session.add(comment)
+        db.session.commit()
+        flash('Your comment has been published', 'success')
+        return redirect(url_for('posts.post_detail', slug=slug, page=-1))
+    
+    page = request.args.get('page', 1, type=int)
+    if page == -1:
+        page = (post.comments.count() - 1) // \
+            current_app.config['BLOG_COMMENTS_PER_PAGE'] + 1
+    pages = post.comments.order_by(Comment.timestamp.asc()).paginate(
+        page, per_page=current_app.config['BLOG_COMMENTS_PER_PAGE'],
+        error_out=False)
+    comments = pages.items
+    
+    return render_template('posts/post_detail.html', posts=[post], tags=tags,
+                                form=form, comments=comments, pages=pages)
+
+
+
+def post(id):
+    post = Post.query.get_or_404(id)
+    form = CommentForm()
+    if form.validate_on_submit():
+        comment = Comment(body=form.body.data,
+                          post=post,
+                          author=current_user._get_current_object())
+        db.session.add(comment)
+        db.session.commit()
+        flash('Your comment has been published.')
+        return redirect(url_for('.post', id=post.id, page=-1))
+    page = request.args.get('page', 1, type=int)
+    if page == -1:
+        page = (post.comments.count() - 1) // \
+            current_app.config['FLASKY_COMMENTS_PER_PAGE'] + 1
+    pagination = post.comments.order_by(Comment.timestamp.asc()).paginate(
+        page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
+        error_out=False)
+    comments = pagination.items
+    return render_template('post.html', posts=[post], form=form,
+                           comments=comments, pagination=pagination)
+
+
+
+
+
+
+
+
+
 
 
 @posts_bp.route('/tag/<slug>')
