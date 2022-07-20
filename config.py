@@ -13,8 +13,8 @@ class Config:
     BLOG_MAIL_SENDER = os.environ.get('BLOG_MAIL_SENDER')
     BLOG_ADMIN = os.environ.get('BLOG_ADMIN')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    BLOG_POSTS_PER_PAGE = 8
-    BLOG_FOLLOWERS_PER_PAGE = 15
+    BLOG_POSTS_PER_PAGE = 5
+    BLOG_FOLLOWERS_PER_PAGE = 5
     
     @staticmethod
     def init_app(app):
@@ -24,7 +24,7 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL')
-    SQLALCHEMY_ECHO = True
+    # SQLALCHEMY_ECHO = True
 
 
 

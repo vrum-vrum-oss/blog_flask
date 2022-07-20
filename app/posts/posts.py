@@ -1,6 +1,6 @@
 from flask_login import login_required
 from . import posts_bp
-from flask import render_template, request, redirect, url_for, flash, current_app, abort
+from flask import render_template, request, redirect, url_for, flash, current_app, abort, make_response
 from flask_login import current_user
 from .. import db
 from ..models import Permission, Post, Tag
@@ -11,16 +11,23 @@ def view():
     q = request.args.get('q')
     page = request.args.get('page', 1, type=int)
     
-    if q:
-        posts = Post.query.filter(Post.title.contains(q) | Post.body.contains(q)).order_by(Post.created.desc())#.all()
+    show_followed = False
+    if current_user.is_authenticated:
+        show_followed = bool(request.cookies.get('show_followed', ''))
+    if show_followed:
+        query = current_user.followed_posts
     else:
-        posts = Post.query.order_by(Post.created.desc())#.all()
+        query = Post.query
+    
+    if q:
+        posts = query.filter(Post.title.contains(q) | Post.body.contains(q)).order_by(Post.created.desc())
+    else:
+        posts = query.order_by(Post.created.desc())
     
     pages = posts.paginate(page=page, per_page=current_app.config['BLOG_POSTS_PER_PAGE'], error_out=False)
     posts = pages.items
 
-    return render_template('posts/blog_view.html', pages=pages, posts=posts)
-
+    return render_template('posts/blog_view.html', pages=pages, posts=posts, show_followed=show_followed)
 
 
 @posts_bp.route('/create', methods=['GET', 'POST'])
@@ -69,3 +76,19 @@ def tag_detail(slug):
     tag = Tag.query.filter_by(slug=slug).first()
     posts = tag.posts.all()
     return render_template('posts/tag_detail.html', tag=tag, posts=posts)
+
+
+@posts_bp.route('/all')
+@login_required
+def show_all():
+    resp = make_response(redirect(url_for('posts.view')))
+    resp.set_cookie('show_followed', '', max_age=30*24*60*60)
+    return resp
+
+
+@posts_bp.route('/followed')
+@login_required
+def show_followed():
+    resp = make_response(redirect(url_for('posts.view')))
+    resp.set_cookie('show_followed', '1', max_age=30*24*60*60)
+    return resp

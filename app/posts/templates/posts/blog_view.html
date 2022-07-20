@@ -26,8 +26,15 @@ Posts
 </div>
 {% endif %}
 
-
-{% include 'posts/_posts.html' %}
+<div class="post-tabs">
+    <ul class="nav nav-tabs">
+        <li class="nav-item"><a href="{{ url_for('posts.show_all') }}" class="nav-link {% if not show_followed %} active {% endif %}">All</a></li>
+        {% if current_user.is_authenticated %}
+        <li class="nav-item"><a href="{{ url_for('posts.show_followed') }}" class="nav-link {% if show_followed %} active {% endif %}">Followed</a></li>
+        {% endif %}
+    </ul>
+    {% include 'posts/_posts.html' %}
+</div>
 
 {% if pages %}
 <div>

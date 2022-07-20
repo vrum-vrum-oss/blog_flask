@@ -135,10 +135,18 @@ class User(db.Model, UserMixin):
                 self.role = Role.query.filter_by(default=True).first()
             if self.email is not None and self.avatar_hash is None:
                 self.avatar_hash = self.gravatar_hash()
+            # make user his own follower upon creation
+            self.follow(self)
 
 
     def __repr__(self):
         return '<User: {}>'.format(self.username)
+    
+    
+    @property
+    def followed_posts(self):
+        return Post.query.join(Follow, Follow.followed_id == Post.author_id)\
+                                    .filter(Follow.follower_id == self.id)
 
 
     @property
@@ -205,7 +213,7 @@ class User(db.Model, UserMixin):
         user.password = new_password
         db.session.add(user)
         return True
-
+    
 
     # Add helper methods self.can and self.is_admin
     # to simplify implementation of roles and permissions
