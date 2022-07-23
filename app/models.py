@@ -11,7 +11,7 @@ import bleach
 import re
 import jwt
 import hashlib
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 
 def slugify(s):
@@ -196,8 +196,8 @@ class User(db.Model, UserMixin):
         token = jwt.encode(
             {
                 "confirm": self.id,
-                "exp": datetime.datetime.now(tz=datetime.timezone.utc)
-                       + datetime.timedelta(seconds=expiration)
+                "exp": datetime.now(tz=timezone.utc)
+                       + timedelta(seconds=expiration)
             },
             current_app.config['SECRET_KEY'],
             algorithm="HS256"
@@ -221,8 +221,8 @@ class User(db.Model, UserMixin):
         token = jwt.encode(
             {
                 "reset": self.id,
-                "exp": datetime.datetime.now(tz=datetime.timezone.utc)
-                       + datetime.timedelta(seconds=expiration)
+                "exp": datetime.now(tz=timezone.utc)
+                       + timedelta(seconds=expiration)
             },
             current_app.config['SECRET_KEY'],
             algorithm="HS256"
@@ -248,8 +248,8 @@ class User(db.Model, UserMixin):
         token = jwt.encode(
             {
                 "id": self.id,
-                "exp": datetime.datetime.now(tz=datetime.timezone.utc)
-                       + datetime.timedelta(seconds=expiration)
+                "exp": datetime.now(tz=timezone.utc)
+                       + timedelta(seconds=expiration)
             },
             current_app.config['SECRET_KEY'],
             algorithm="HS256"
