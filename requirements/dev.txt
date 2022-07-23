@@ -1,2 +1,4 @@
 -r common.txt
 Faker==13.15.0
+coverage==6.4.2
+httpie==3.2.1
