@@ -75,6 +75,7 @@ class Post(db.Model):
     def to_json(self):
         json_post = {
             'url': url_for('api.get_post', id=self.id),
+            'title': self.title,
             'body': self.body,
             'body_html': self.body_html,
             'timestamp': self.created,
@@ -87,10 +88,13 @@ class Post(db.Model):
     
     @staticmethod
     def from_json(json_post):
+        title = json_post.get('title')
         body = json_post.get('body')
+        if title is None or title == '':
+            raise ValidationError('Post does not have a title')
         if body is None or body == '':
             raise ValidationError('Post does not have a body')
-        return Post(body=body)
+        return Post(title=title, body=body)
 
         
 
@@ -443,3 +447,21 @@ class Comment(db.Model):
     disabled = db.Column(db.Boolean)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+
+
+    def to_json(self):
+        json_comment = {
+            'url': url_for('api.get_comment', id=self.id),
+            'post_url': url_for('api.get_post', id=self.post_id),
+            'body': self.body,
+            'timestamp': self.timestamp,
+            'author_url': url_for('api.get_user', id=self.author_id),
+        }
+        return json_comment
+
+    @staticmethod
+    def from_json(json_comment):
+        body = json_comment.get('body')
+        if body is None or body == '':
+            raise ValidationError('Comment does not have a body')
+        return Comment(body=body)
