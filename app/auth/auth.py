@@ -48,7 +48,7 @@ def register():
         send_email(user.email, 'Confirm your Account', 'auth/email/confirm', user=user, token=token)
         flash('A confirmation email has been sent to you by email', 'success')
         # flash('You can now login', 'success')
-        return redirect(url_for('main.index'))
+        return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html', form=form)
 

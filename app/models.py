@@ -208,7 +208,7 @@ class User(db.Model, UserMixin):
     def confirm(self, token):
         try:
             data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-        except jwt.ExpiredSignatureError:
+        except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
             return False
         if data.get('confirm') != self.id:
             return False
