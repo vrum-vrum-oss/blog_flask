@@ -2,15 +2,16 @@ from . import db, login_manager
 from sqlalchemy.sql import func
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
-from flask import current_app
+from flask import current_app, url_for
+from wtforms import ValidationError
+from app.exceptions import ValidationError
+
 from markdown import markdown
 import bleach
-
-
 import re
 import jwt
 import hashlib
-import datetime
+from datetime import datetime, timezone
 
 
 def slugify(s):
@@ -30,7 +31,7 @@ class Follow(db.Model):
     __tablename__ = 'follows'
     follower_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     followed_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 class Post(db.Model):
@@ -39,7 +40,7 @@ class Post(db.Model):
     slug = db.Column(db.String(140), unique=True)
     body = db.Column(db.Text)
     body_html = db.Column(db.Text)
-    created = db.Column(db.DateTime, default=func.now(), index=True)
+    created = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     tags = db.relationship('Tag', secondary=post_tags,
                            backref=db.backref('posts', lazy='dynamic'),
@@ -47,18 +48,19 @@ class Post(db.Model):
     comments = db.relationship('Comment', backref='post', lazy='dynamic', cascade="all, delete-orphan")
 
 
-    # def __init__(self, *args, **kwargs):
-        # super().__init__(*args, **kwargs)
-        # self.generate_slug()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.generate_slug()
 
 
     def __repr__(self):
         return '<Post id: {}, title: {}>'.format(self.id, self.title)
 
 
-    # def generate_slug(self):
-    #     if self.title:
-    #         self.slug = slugify(self.title)
+    def generate_slug(self):
+        if self.title:
+            self.slug = slugify(self.title)
+            
             
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):
@@ -69,19 +71,40 @@ class Post(db.Model):
             markdown(value, output_format='html'),
             tags=allowed_tags, strip=True))
         
+        
+    def to_json(self):
+        json_post = {
+            'url': url_for('api.get_post', id=self.id),
+            'body': self.body,
+            'body_html': self.body_html,
+            'timestamp': self.created,
+            'author_url': url_for('api.get_user', id=self.author_id),
+            'comments_url': url_for('api.get_post_comments', id=self.id),
+            'comment_count': self.comments.count()
+        }
+        return json_post
+    
+    
+    @staticmethod
+    def from_json(json_post):
+        body = json_post.get('body')
+        if body is None or body == '':
+            raise ValidationError('Post does not have a body')
+        return Post(body=body)
+
+        
 
 db.event.listen(Post.body, 'set', Post.on_changed_body)
 
 @db.event.listens_for(Post, "after_insert")
 def after_insert(mapper, connection, target):
     link_table = Post.__table__
-    slug = slugify(target.title) + '_' + str(target.id)
-    if target.slug is None:
-        connection.execute(
-            link_table.update().
-            where(link_table.c.id==target.id).
-            values(slug=slug)
-        )
+    slug = target.slug + '_' + str(target.id)
+    connection.execute(
+        link_table.update().
+        where(link_table.c.id==target.id).
+        values(slug=slug)
+    )
 
 
 class Tag(db.Model):
@@ -109,8 +132,8 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(64))
     location = db.Column(db.String(64))
     about_me = db.Column(db.Text())
-    member_since = db.Column(db.DateTime(), default=func.now())
-    last_seen = db.Column(db.DateTime(), default=func.now())
+    member_since = db.Column(db.DateTime(), default=datetime.utcnow)
+    last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     avatar_hash = db.Column(db.String(32))
     posts = db.relationship('Post', backref='author', lazy='dynamic', cascade="all, delete-orphan")
     followed = db.relationship('Follow',
@@ -216,6 +239,28 @@ class User(db.Model, UserMixin):
         db.session.add(user)
         return True
     
+    
+    def generate_auth_token(self, expiration=3600):
+        token = jwt.encode(
+            {
+                "id": self.id,
+                "exp": datetime.datetime.now(tz=datetime.timezone.utc)
+                       + datetime.timedelta(seconds=expiration)
+            },
+            current_app.config['SECRET_KEY'],
+            algorithm="HS256"
+        )
+        return token
+
+
+    @staticmethod
+    def verify_auth_token(token):
+        try:
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
+        except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
+            return None
+        return User.query.get(data['id'])
+    
 
     # Add helper methods self.can and self.is_admin
     # to simplify implementation of roles and permissions
@@ -267,6 +312,21 @@ class User(db.Model, UserMixin):
             return False
         return self.followers.filter_by(
             follower_id=user.id).first() is not None
+        
+        
+    def to_json(self):
+        json_user = {
+            'url': url_for('api.get_user', id=self.id),
+            'username': self.username,
+            'member_since': self.member_since,
+            'last_seen': self.last_seen,
+            'posts_url': url_for('api.get_user_posts', id=self.id),
+            'followed_posts_url': url_for('api.get_user_followed_posts',
+            id=self.id),
+            'post_count': self.posts.count()
+        }
+        return json_user
+
 
 
 
@@ -379,7 +439,7 @@ class Comment(db.Model):
     __tablename__ = 'comment'
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.datetime.utcnow)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     disabled = db.Column(db.Boolean)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
