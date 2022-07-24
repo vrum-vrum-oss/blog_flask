@@ -36,7 +36,7 @@ def get_user_followed_posts(id):
     user = User.query.get_or_404(id)
     page = request.args.get('page', 1, type=int)
     pagination = user.followed_posts.order_by(Post.created.desc()).paginate(
-        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+        page, per_page=current_app.config['BLOG_POSTS_PER_PAGE'],
         error_out=False)
     posts = pagination.items
     prev = None

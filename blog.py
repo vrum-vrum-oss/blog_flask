@@ -14,6 +14,9 @@ from app import create_app, db
 from app.models import Post, Tag, User, Role, Follow, Comment
 
 
+import tests as t
+
+
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
     
     
@@ -31,7 +34,8 @@ def test(coverage):
         os.environ['FLASK_COVERAGE'] = '1'
         os.execvp(sys.executable, [sys.executable] + sys.argv)
     import unittest
-    tests = unittest.TestLoader().discover('tests')
+    # tests = unittest.TestLoader().discover('tests')
+    tests = unittest.TestLoader().loadTestsFromTestCase(t.test_api.APITestCase)
     unittest.TextTestRunner(verbosity=2).run(tests)
     if COV:
         COV.stop()

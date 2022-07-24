@@ -27,7 +27,7 @@ def verify_password(email_or_token, password):
         return g.current_user is not None
     
     user = User.query.filter_by(email=email_or_token).first()
-    if not User:
+    if not user:
         return False
     
     g.current_user= user
