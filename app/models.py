@@ -318,6 +318,15 @@ class User(db.Model, UserMixin):
             follower_id=user.id).first() is not None
         
         
+    @staticmethod
+    def add_self_follows():
+        for user in User.query.all():
+            if not user.is_following(user):
+                user.follow(user)
+                db.session.add(user)
+                db.session.commit()
+        
+        
     def to_json(self):
         json_user = {
             'url': url_for('api.get_user', id=self.id),

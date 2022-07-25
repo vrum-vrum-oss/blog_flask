@@ -1,18 +1,18 @@
 import os
 
-
 COV = None
 if os.environ.get('FLASK_COVERAGE'):
     import coverage
     COV = coverage.coverage(branch=True, include='app/*')
     COV.start()
 
-
 import sys
 import click
 from app import create_app, db
 from app.models import Post, Tag, User, Role, Follow, Comment
 
+from flask_migrate import upgrade
+from app.models import Role, User
 
 import tests as t
 
@@ -49,6 +49,32 @@ def test(coverage):
         print('HTML version: file://%s/index.html' % covdir)
         COV.erase()
         
+
+@app.cli.command()
+@click.option('--length', default=25,
+              help='Number of functions to include in the profiler report.')
+@click.option('--profile-dir', default=None,
+              help='Directory where profiler data files are saved.')
+def profile(length, profile_dir):
+    """Start the application under the code profiler."""
+    from werkzeug.middleware.profiler import ProfilerMiddleware
+    app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[length],
+                                      profile_dir=profile_dir)
+    app.run(debug=False)
+    
+    
+
+@app.cli.command
+def deploy():
+    """Run deployment tasks."""
+    # migrate database to latest revision
+    upgrade()
+    
+    # create or update user roles
+    Role.insert_roles()
+    
+    # ensure all users are following themselves
+    User.add_self_follows()
 
 
 if __name__ == '__main__':
