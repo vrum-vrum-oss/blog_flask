@@ -34,8 +34,9 @@ def test(coverage):
         os.environ['FLASK_COVERAGE'] = '1'
         os.execvp(sys.executable, [sys.executable] + sys.argv)
     import unittest
-    # tests = unittest.TestLoader().discover('tests')
-    tests = unittest.TestLoader().loadTestsFromTestCase(t.test_api.APITestCase)
+    tests = unittest.TestLoader().discover('tests')
+    # tests = unittest.TestLoader().loadTestsFromTestCase(t.test_selenium.SeleniumTestCase)
+    # tests = unittest.TestLoader().loadTestsFromTestCase(t.test_client.FlaskClientTestCase)
     unittest.TextTestRunner(verbosity=2).run(tests)
     if COV:
         COV.stop()

@@ -5,15 +5,18 @@ from wtforms import ValidationError
 from ..models import User
 
 
+# from wtforms.widgets import PasswordInput
+# widget=PasswordInput(hide_value=False)
+
 class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Length(1,64), Email()])
+    email = StringField('Email', validators=[DataRequired(), Length(1,64), Email(message='Invalid email address')])
     password = PasswordField('Password', validators=[DataRequired(), Length(8,16)])
     remember_me = BooleanField('Keep me logged in')
     submit = SubmitField('Log in')
 
 
 class RegistrationForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Length(1,64), Email()])
+    email = StringField('Email', validators=[DataRequired(), Length(1,64), Email(message='Invalid email address')])
     username = StringField('Username', validators=[
         DataRequired(), Length(1, 64),
         Regexp('^[A-Za-z][\w.]*$', 0,

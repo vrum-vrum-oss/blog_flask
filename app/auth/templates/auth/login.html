@@ -13,6 +13,18 @@ Log in
 
 {% block content %}
 
+{% if form.errors %}
+    <ul>
+    {% for field, errors in form.errors.items() %}
+        <li style="list-style-type: none;">
+            <div class="alert alert-danger col-md-6" role="alert"
+            style="--bs-alert-padding-y: 0.5rem;">
+            {{ ', '.join(errors) }}</div>
+        </li>
+    {% endfor %}
+</ul>
+{% endif %}
+
 <!-- <form role="form" action="{{ url_for('auth.login') }}" method="POST"> -->
 <form role="form" method="POST">
     {{ form.hidden_tag() }}

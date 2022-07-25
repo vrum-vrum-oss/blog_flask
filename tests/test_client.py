@@ -31,15 +31,15 @@ class FlaskClientTestCase(unittest.TestCase):
         response = self.client.post('/auth/register', data={
             'email': 'john@example.com',
             'username': 'john',
-            'password': 'cat',
-            'password2': 'cat'
-        }, follow_redirects=False)
-        self.assertEqual(response.status_code, 302)
+            'password': 'caterpillar',
+            'password2': 'caterpillar',
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
 
         # login with the new account
         response = self.client.post('/auth/login', data={
             'email': 'john@example.com',
-            'password': 'cat'
+            'password': 'caterpillar'
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(re.search(b'Hello,\s+john!', response.data))

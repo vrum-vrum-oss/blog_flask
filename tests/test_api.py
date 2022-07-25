@@ -171,10 +171,11 @@ class APITestCase(unittest.TestCase):
             headers=self.get_api_headers('john@example.com', 'cat'))
         self.assertEqual(response.status_code, 200)
         json_response = json.loads(response.get_data(as_text=True))
-        print(json_response)
+        # print(json_response)
         self.assertIsNotNone(json_response.get('posts'))
         # self.assertEqual(json_response.get('count', 0), 1)
         # self.assertEqual(json_response['posts'][0], json_post)
+        # empty response ???
 
         # edit post
         response = self.client.put(
