@@ -40,6 +40,7 @@ def server_shutdown():
 
 @main_bp.after_app_request
 def after_request(response):
+    """Report slow database queries"""
     for query in get_debug_queries():
         if query.duration >= current_app.config['BLOG_SLOW_DB_QUERY_TIME']:
             current_app.logger.warning(

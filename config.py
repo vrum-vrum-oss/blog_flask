@@ -13,9 +13,9 @@ class Config:
     BLOG_MAIL_SENDER = os.environ.get('BLOG_MAIL_SENDER')
     BLOG_ADMIN = os.environ.get('BLOG_ADMIN')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    BLOG_POSTS_PER_PAGE = 5
-    BLOG_FOLLOWERS_PER_PAGE = 5
-    BLOG_COMMENTS_PER_PAGE = 5
+    BLOG_POSTS_PER_PAGE = 10
+    BLOG_FOLLOWERS_PER_PAGE = 20
+    BLOG_COMMENTS_PER_PAGE = 10
     SQLALCHEMY_RECORD_QUERIES = True
     BLOG_SLOW_DB_QUERY_TIME = 0.5
     
@@ -41,6 +41,8 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    # extra arguments to work on PythonAnywhere
+    SQLALCHEMY_ENGINE_OPTIONS = {"pool_recycle": 280}
     
     @classmethod
     def init_app(cls, app):

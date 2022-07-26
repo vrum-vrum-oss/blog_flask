@@ -12,14 +12,25 @@ Hello,
 {% if current_user.is_authenticated %}
     {{ current_user.username -}}
 {% else %}
-    Stranger
-{% endif %}!
+    stranger
+{% endif %}
 
 {% endblock %}
 
 
 {% block content %}
     <div>
-        Some index content
+        <h3>
+        Welcome to Flasky Blog!<br></h3>
+    
+        Go to 
+        <a href="{{ url_for('posts.view') }}">blog</a><br>
+    {% if current_user.is_anonymous %}
+        <a href="{{ url_for('auth.login') }}">Log in</a>
+        or
+        <a href="{{ url_for('auth.register') }}">register</a>
+        to be a part of our community
+    {% endif %}
+        
     </div>
 {% endblock %}
