@@ -1,4 +1,5 @@
 import os
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
@@ -41,8 +42,9 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    
     # extra arguments to work on PythonAnywhere
-    SQLALCHEMY_ENGINE_OPTIONS = {"pool_recycle": 280}
+    # 
     
     @classmethod
     def init_app(cls, app):
@@ -68,12 +70,28 @@ class ProductionConfig(Config):
         
         if not app.debug:
             app.logger.addHandler(mail_handler)
+            
+            
+class DockerConfig(ProductionConfig):
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DOCKER_DATABASE_URL')
+    
+    @classmethod
+    def init_app(cls, app):
+        ProductionConfig.init_app(app)
+
+        # log to stderr
+        import logging
+        from logging import StreamHandler
+        file_handler = StreamHandler()
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
 
 
 config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
+    'docker': DockerConfig,
     
     'default': DevelopmentConfig
 }

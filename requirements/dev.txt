@@ -7,7 +7,6 @@ charset-normalizer==2.1.0
 commonmark==0.9.1
 coverage==6.4.2
 defusedxml==0.7.1
-email-validator==1.2.1
 h11==0.13.0
 httpie==3.2.1
 multidict==6.0.2

@@ -14,7 +14,7 @@ from app.models import Post, Tag, User, Role, Follow, Comment
 from flask_migrate import upgrade
 from app.models import Role, User
 
-import tests as t
+# import tests as t
 
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
@@ -64,9 +64,9 @@ def profile(length, profile_dir):
     
     
 
-@app.cli.command
+@app.cli.command()
 def deploy():
-    """Run deployment tasks."""
+    """Run deployment tasks"""
     # migrate database to latest revision
     upgrade()
     
